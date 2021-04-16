@@ -8,11 +8,13 @@ with open("upbit.txt") as f:
     secret = lines[1].strip()
     upbit = pyupbit.Upbit(key, secret)
 
+
 def get_yesterday_ma5(ticker):
     df = pyupbit.get_ohlcv(ticker)
     close = df['close']
     ma = close.rolling(window=5).mean()
     return ma[-2]
+
 
 def get_target_price(ticker):
     df = pyupbit.get_ohlcv(ticker)
@@ -24,16 +26,19 @@ def get_target_price(ticker):
     target = today_open + (yesterday_high - yesterday_low) * 0.032
     return target
 
- def buy_crypto_currency(ticker):
+
+def buy_crypto_currency(ticker):
     krw = upbit.get_balance(ticker)[2]
     orderbook = pyupbit.get_orderbook(ticker)
     sell_price = orderbook['asks'][0]['price']
-    unit = krw/float(sell_price)
+    unit = krw / float(sell_price)
     upbit.buy_market_order(ticker, unit)
+
 
 def sell_crypto_currency(ticker):
     unit = upbit.get_balance(ticker)[0]
     upbit.sell_market_order(ticker, unit)
+
 
 now = datetime.datetime.now()
 mid = datetime.datetime(now.year, now.month, now.day) + datetime.timedelta(1)
@@ -53,6 +58,7 @@ while True:
         current_price = pyupbit.get_current_price("KRW-BTC")
         if (current_price > target_price) and (current_price > ma5):
             buy_crypto_currency("BTC")
+
     except:
         print("에러 발생")
     time.sleep(1)
